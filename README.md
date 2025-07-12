@@ -5,6 +5,8 @@ A responsive and interactive Employee Directory built with HTML, CSS, JavaScript
 ---
 
 ## 📸 Screenshots
+<img width="1353" height="581" alt="image" src="https://github.com/user-attachments/assets/61b64ce5-f534-48a9-855b-5650cd41a9e0" />
+
 
 ### Dashboard View
 Displays a list of employee cards with Edit/Delete options.
