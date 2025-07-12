@@ -6,7 +6,8 @@ A responsive and interactive Employee Directory built with HTML, CSS, JavaScript
 
 ## 🔗 Live Demo
 
-👉 [Click here to view the app](fancy-tanuki-62b345.netlify.app)
+👉 [Click here to view the app](https://fancy-tanuki-62b345.netlify.app/)
+
 
 ## 📸 Screenshots
 
