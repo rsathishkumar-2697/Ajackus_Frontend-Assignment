@@ -5,7 +5,10 @@ A responsive and interactive Employee Directory built with HTML, CSS, JavaScript
 ---
 
 ## 📸 Screenshots
-<img width="1353" height="581" alt="image" src="https://github.com/user-attachments/assets/61b64ce5-f534-48a9-855b-5650cd41a9e0" />
+<img width="1366" height="584" alt="Main" src="https://github.com/user-attachments/assets/aec8f28a-0181-4e72-a4f1-d42f26f1ece7" />
+<img width="1350" height="596" alt="Main 1" src="https://github.com/user-attachments/assets/400cbfbf-829c-4c2b-a028-62e01628301f" />
+<img width="1355" height="597" alt="Main 2" src="https://github.com/user-attachments/assets/297f46ff-a8ba-4fe0-b518-215dca9f0bd0" />
+<img width="1353" height="581" alt="Main 3" src="https://github.com/user-attachments/assets/f493322b-3e57-4602-bfc0-5de3ca70e520" />
 
 
 ### Dashboard View
