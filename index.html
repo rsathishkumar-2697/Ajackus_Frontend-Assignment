@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Directory</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; }
+    header { background-color: #222; color: white; padding: 1rem; }
+    .header-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+    .header-actions input { padding: 6px; width: 60%; max-width: 300px; }
+    .header-actions button { background-color: #555; color: white; border: none; padding: 6px 12px; cursor: pointer; }
+    .controls { background: white; padding: 1rem; display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center;}
+    .controls select, .controls button { padding: 6px; }
+    .controls button { padding:6px; background-color: #228B22; border: none; color: white; border-radius: 4px; cursor: pointer; }
+    .main-wrapper { display: flex; }
+    #employeeList { display: flex; flex-wrap: wrap; gap: 2rem; padding: 1rem; flex: 1; }
+    .employee-card { background: white; padding: 1rem; border-radius: 6px; box-shadow: 0 0 3px rgba(0,0,0,0.2); width: 100%; max-width: 300px; }
+    .card-actions { display: flex; justify-content: space-between; margin-top: 10px; }
+    footer { background-color: #222; color: white; padding: 1rem; text-align: center; }
+    .modal, .filter-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-content, .filter-modal-content { background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 450px; }
+    .modal.hidden, .filter-modal.hidden { display: none; }
+    .modal-content form, .filter-modal-content form { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .modal-content form, h3 { font-size: 25px; font-weight: 700; }
+    .modal-content form label, .filter-modal-content form label { grid-column: span 2; font-weight: 500; font-size: 15px; margin-top: 10px; }
+    .modal-content form input, .modal-content form select, .filter-modal-content form input { padding: 6px; width: 100%;  }
+    .modal-actions { grid-column: span 2; display: flex; justify-content: flex-end; gap: 10px; margin-top: 1rem; }
+    .add-btn { background-color: #007BFF; color: white; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; }
+    .cancel-btn { cursor: pointer;}
+  </style>
+</head>
+<body>
+  <header class="header-actions">
+    <h2>Employee Directory</h2>
+    <input type="text" id="searchInput" placeholder="Search by name or email"/>
+    <button id="filterBtn">Filter</button>
+  </header>
+
+  <div class="controls">
+    <div>
+      Sort:
+      <select id="sortBy">
+        <option value="select">--Select--</option>
+        <option value="firstName">First Name</option>
+        <option value="department">Department</option>
+      </select>
+      Show:
+      <select id="showCount">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </div>
+    <button id="addEmployeeBtn">Add Employee</button>
+  </div>
+
+    <main id="employeeList"></main>
+
+  <footer>
+    © 2025 Employee Directory App. All rights reserved.
+  </footer>
+
+ <div class="modal hidden" id="employeeModal">
+    <div class="modal-content">
+      <h3 id="modalTitle">Add Employee</h3>
+      <form id="employeeForm">
+        <input type="hidden" id="empId" />
+        <label>First name</label>
+        <input type="text" id="firstName" required>
+        <label>Last name</label>
+        <input type="text" id="lastName" required>
+        <label>Email</label>        
+        <input type="email" id="email" required>
+        <label>Department</label>
+        <select id="department" required>
+          <option value="">Select</option>
+          <option value="HR">HR</option>
+          <option value="IT">IT</option>
+          <option value="Finance">Finance</option>
+        </select>
+        <label>Role</label>
+        <select id="role" required>
+          <option value="">Select</option>
+          <option value="Manager">Manager</option>
+          <option value="Developer">Developer</option>
+          <option value="Analyst">Analyst</option>
+        </select>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="add-btn">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="filter-modal hidden" id="filterModal">
+    <div class="filter-modal-content">
+      <h3>Filter Employees</h3>
+      <form>
+        <label>First Name</label>
+        <input type="text" id="filterFirstName">
+        <label>Department</label>
+        <input type="text" id="filterDepartment">
+        <label>Role</label>
+        <input type="text" id="filterRole">
+        <div class="modal-actions">
+          <button type="button" onclick="closeFilter()">Cancel</button>
+          <button type="button" onclick="applyFilter()">Apply</button>
+          <button type="button" onclick="resetFilter()">Reset</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let employees = [
+        { id: 1, firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', department: 'HR', role: 'Manager' },
+        { id: 2, firstName: 'Bob', lastName: 'Johnson', email: 'bob@example.com', department: 'IT', role: 'Developer' },
+        { id: 3, firstName: 'Charlie', lastName: 'Lee', email: 'charlie@example.com', department: 'Finance', role: 'Analyst' },
+        { id: 4, firstName: 'David', lastName: 'Brown', email: 'david@example.com', department: 'IT', role: 'Developer' },
+        { id: 5, firstName: 'Eva', lastName: 'Williams', email: 'eva@example.com', department: 'HR', role: 'Analyst' },
+        { id: 6, firstName: 'Frank', lastName: 'Garcia', email: 'frank@example.com', department: 'Finance', role: 'Manager' }        
+    ];
+
+    let editingId = null;
+
+    const employeeList = document.getElementById('employeeList');
+    const employeeModal = document.getElementById('employeeModal');
+    const employeeForm = document.getElementById('employeeForm');
+    const filterModal = document.getElementById('filterModal');
+
+    function renderEmployees(list = employees) {
+      employeeList.innerHTML = '';
+      list.forEach(emp => {
+        const card = document.createElement('div');
+        card.className = 'employee-card';
+        card.innerHTML = `
+          <strong>${emp.firstName} ${emp.lastName}</strong>
+          <p><strong>Email:</strong> ${emp.email}</p>
+          <p><strong>Department:</strong> ${emp.department}</p>
+          <p><strong>Role:</strong> ${emp.role}</p>
+          <div class="card-actions">
+            <button onclick="editEmployee(${emp.id})">Edit</button>
+            <button onclick="deleteEmployee(${emp.id})">Delete</button>
+          </div>
+        `;
+        employeeList.appendChild(card);
+      });
+    }
+
+    function openModal() { employeeModal.classList.remove('hidden'); }
+    function closeModal() { employeeModal.classList.add('hidden'); employeeForm.reset(); editingId = null; }
+    function openFilter() { filterModal.classList.remove('hidden'); }
+    function closeFilter() { filterModal.classList.add('hidden'); }
+
+    function editEmployee(id) {
+      const emp = employees.find(e => e.id === id);
+      if (emp) {
+        document.getElementById('empId').value = emp.id;
+        document.getElementById('firstName').value = emp.firstName;
+        document.getElementById('lastName').value = emp.lastName;
+        document.getElementById('email').value = emp.email;
+        document.getElementById('department').value = emp.department;
+        document.getElementById('role').value = emp.role;
+        editingId = id;
+        openModal();
+      }
+    }
+
+    function deleteEmployee(id) {
+      employees = employees.filter(e => e.id !== id);
+      renderEmployees();
+    }
+
+    document.getElementById('addEmployeeBtn').onclick = openModal;
+    document.getElementById('filterBtn').onclick = openFilter;
+
+    employeeForm.onsubmit = function (e) {
+      e.preventDefault();
+      const newEmp = {
+        id: editingId || Date.now(),
+        firstName: document.getElementById('firstName').value.trim(),
+        lastName: document.getElementById('lastName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        department: document.getElementById('department').value,
+        role: document.getElementById('role').value
+      };
+
+      if (editingId) {
+        const index = employees.findIndex(e => e.id === editingId);
+        employees[index] = newEmp;
+      } else {
+        employees.push(newEmp);
+      }
+
+      closeModal();
+      renderEmployees();
+    };
+
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+    const query = e.target.value.toLowerCase();
+    const filtered = employees.filter(emp =>
+        emp.firstName.toLowerCase().includes(query) ||
+        emp.lastName.toLowerCase().includes(query) ||
+        emp.email.toLowerCase().includes(query)
+    );
+    renderEmployees(filtered);
+    });
+
+
+    function applyFilter() {
+      const name = document.getElementById('filterFirstName').value.toLowerCase();
+      const dept = document.getElementById('filterDepartment').value.toLowerCase();
+      const role = document.getElementById('filterRole').value.toLowerCase();
+      const filtered = employees.filter(emp => {
+        return emp.firstName.toLowerCase().includes(name) &&
+               emp.department.toLowerCase().includes(dept) &&
+               emp.role.toLowerCase().includes(role);
+      });
+      renderEmployees(filtered);
+      closeFilter();
+    }
+
+    function resetFilter() {
+      document.getElementById('filterFirstName').value = '';
+      document.getElementById('filterDepartment').value = '';
+      document.getElementById('filterRole').value = '';
+      renderEmployees();
+    }
+
+    renderEmployees();
+  </script>
+</body>
+</html>
